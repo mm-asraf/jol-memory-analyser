@@ -21,6 +21,9 @@ memory-report*.xlsx
 .springBeans
 .sts4-cache
 
+### Gradle ###
+.gradle/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
