@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+  <id>io.github.mm-asraf.jol-memory-analyser</id>
+  <name>JOL Memory Analyser</name>
+  <vendor email="mahboob.webdev.asraf@gmail.com" url="https://github.com/mm-asraf/jol-memory-analyser">Mahboob Asraf</vendor>
+
+  <description><![CDATA[
+    Runs the <a href="https://openjdk.org/projects/code-tools/jol/">JOL</a>-based memory layout scanner on your project or the current Java file.
+    Requires the <code>jol-memory-analyser-*-standalone.jar</code> (build locally or resolve from Maven Central). See plugin README for setup.
+  ]]></description>
+
+  <change-notes><![CDATA[
+    1.0.3: Missing standalone JAR / setup instructions appear in the tool window (not a popup). Maven local repo resolution uses IntelliJ's effective repository path.<br/>
+    1.0.2: Scanner output streams to the <b>JOL Memory Analyser</b> tool window (bottom) instead of a modal dialog.<br/>
+    1.0.1: Support IntelliJ 2023.2 (build 232+) in addition to newer releases.<br/>
+    1.0.0: Scan project / Scan current Java file via context menu and Tools menu.
+  ]]></change-notes>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="JolMemoryAnalyser" secondary="true" anchor="bottom" canCloseContents="true"
+                factoryClass="io.github.mmasraf.jol.intellij.JolMemoryAnalyserToolWindowFactory"/>
+    <applicationService serviceImplementation="io.github.mmasraf.jol.intellij.JolMemoryAnalyserSettings"/>
+    <applicationConfigurable
+        parentId="tools"
+        instance="io.github.mmasraf.jol.intellij.JolMemoryAnalyserConfigurable"
+        id="io.github.mm-asraf.jol.settings"
+        displayName="JOL Memory Analyser"/>
+  </extensions>
+
+  <actions>
+    <group id="JolMemoryAnalyser.EditorGroup" text="JOL Memory Analyser" popup="true">
+      <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+      <action id="JolMemoryAnalyser.ScanCurrentFile"
+              class="io.github.mmasraf.jol.intellij.ScanCurrentFileAction"
+              text="Scan with JOL Memory Analyser"
+              description="Run layout scan for the current Java file (uses compiled classes under target/classes)."/>
+      <action id="JolMemoryAnalyser.ScanProjectFromEditor"
+              class="io.github.mmasraf.jol.intellij.ScanProjectAction"
+              text="Scan whole project with JOL Memory Analyser"
+              description="Scan all classes under target/classes of the open project."/>
+    </group>
+
+    <action id="JolMemoryAnalyser.ScanProjectTools"
+            class="io.github.mmasraf.jol.intellij.ScanProjectAction"
+            text="Scan project with JOL Memory Analyser…"
+            description="Scan compiled classes (target/classes) and write Excel reports.">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+  </actions>
+</idea-plugin>
