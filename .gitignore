@@ -3,7 +3,6 @@ memory-report*.xlsx
 *-developer.xlsx
 
 ### Local-only / editor metadata (do not commit) ###
-.github/
 .qodo/
 
 ### IntelliJ IDEA ###
@@ -33,7 +32,8 @@ memory-report*.xlsx
 build/
 
 ### VS Code ###
-.vscode/
+.vscode/*
+!.vscode/tasks.json
 
 ### Mac OS ###
 .DS_Store

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions & ideas
+    url: https://github.com/mm-asraf/jol-memory-analyser/discussions
+    about: Ask the community (best for usage questions before opening an issue).

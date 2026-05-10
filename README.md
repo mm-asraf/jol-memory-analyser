@@ -1,8 +1,14 @@
 # JOL Memory Analyser
 
+[![CI](https://github.com/mm-asraf/jol-memory-analyser/actions/workflows/ci.yml/badge.svg)](https://github.com/mm-asraf/jol-memory-analyser/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mm-asraf/jol-memory-analyser.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 A practical exploration of JVM object memory layout using [Java Object Layout (JOL)](https://openjdk.org/projects/code-tools/jol/). Compares shallow vs retained sizes, field alignment and padding, boxing overhead, and per-element costs across common Java data structures.
 
-Built and tested on Java 17+.
+Built and tested on Java 17+. **License:** [Apache License 2.0](LICENSE).
+
+**Contributing:** see [CONTRIBUTING.md](CONTRIBUTING.md), [Code of Conduct](CODE_OF_CONDUCT.md), and [Security policy](SECURITY.md).
 
 **Published on Maven Central** — [`1.0.1` overview](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/overview) · [artifact files](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar) · [search.maven.org](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar)
 
@@ -63,7 +69,35 @@ Add the dependency (replace **`1.0.1`** with the latest [Central listing](https:
 implementation("io.github.mm-asraf:jol-memory-analyser:1.0.1")
 ```
 
-The scanner entry point is **`com.asraf.jol.ProjectScanner`**. It analyses **compiled** classes (`target/classes` or another output directory). Run **`mvn compile`** (or your build) on the host project before scanning.
+### What Maven Central shows vs how you run it
+
+On **[Maven Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/overview)** or **[search.maven.org](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar)** you get **coordinates** and the **`<dependency>`** snippet only. The portal does **not** print the command that generates the Excel reports—use this README or the repository linked under **Project URL** / **Source Control** on the artifact overview.
+
+### Run the scanner (after you add the dependency)
+
+From the **root of your Maven project** (the same `pom.xml` where you declared the dependency):
+
+```bash
+mvn -q compile exec:java -Dexec.mainClass=com.asraf.jol.ProjectScanner
+```
+
+**Result:** by default **`memory-report.xlsx`** and **`memory-report-developer.xlsx`** in the working directory (override with **`--output`** / **`--output-dev`** — see **Scan commands** below).
+
+The scanner analyses **`target/classes`** (compile first). Entry point: **`com.asraf.jol.ProjectScanner`**.
+
+If Maven says it cannot run **`exec:java`**, declare **`exec-maven-plugin`** once:
+
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>3.1.0</version>
+    </plugin>
+  </plugins>
+</build>
+```
 
 ### Runnable standalone JAR
 
@@ -229,23 +263,25 @@ Structure              Category    Shallow   Retained    Bytes/elem  Overhead
 
 ## Using the library (after you add the dependency)
 
-You resolved **`io.github.mm-asraf:jol-memory-analyser`** from [Maven Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/overview) (see **Use from Maven Central** above for the XML / Gradle coordinates). Then:
+You resolved **`io.github.mm-asraf:jol-memory-analyser`** from [Maven Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/overview). Follow **Run the scanner (after you add the dependency)** above for the main command line (`mvn -q compile exec:java …`), **`exec-maven-plugin`** setup, and defaults (**`memory-report*.xlsx`**).
 
-1. **Compile the project you want to analyse** so bytecode exists under **`target/classes`** (or another output directory you pass with **`--dir`**).
+1. **Compile** so **`target/classes`** exists (or pass **`--dir`** to another output tree).
 
-2. **Run the scanner** from that project’s root. The entry point is **`com.asraf.jol.ProjectScanner`**. Typical invocation so Maven puts **your compile dependencies** on the classpath (important for Spring Boot and similar):
+2. **Spring Boot / frameworks** — prefer **`mvn compile exec:java …`** so dependency classes stay on the classpath; see **Runnable standalone JAR** / Spring note if you use **`java -jar`** instead.
 
-   ```bash
-   mvn -q compile exec:java -Dexec.mainClass=com.asraf.jol.ProjectScanner
-   ```
+3. **CLI flags** (`--class`, `--file`, **`--dir`**, **`--output`**) — **Scan commands** below and **`ProjectScanner`** source.
 
-   If your POM does not yet define **`exec-maven-plugin`**, add a minimal `exec-maven-plugin` execution, or run the **standalone** uber-JAR instead (**Runnable standalone JAR** and **Spring Boot** note above).
+4. **Embedding** — use **`LayoutAnalyser`**, **`ClassScanner`**, and reporters from code on your application classpath.
 
-3. **Outputs** — by default the scanner writes **`memory-report.xlsx`** (technical) and **`memory-report-developer.xlsx`** (developer guide) in the **working directory**. Override with **`--output`** / **`--output-dev`**. Column meanings, colours, and CLI flags are in **Project scanner — Excel reports** and **Scan commands** above.
+## Community
 
-4. **Optional CLI flags** — scan one class (`--class`, `--file`), another tree (`--dir`), custom report paths. See the **`ProjectScanner`** comment block in source or the bash examples under **Scan commands**.
-
-5. **Embedding in code** — you can call **`LayoutAnalyser`**, **`ClassScanner`**, and the reporters from your own tools/tests on the same classpath as your application classes.
+| Resource | Link |
+|----------|------|
+| Issues | [github.com/mm-asraf/jol-memory-analyser/issues](https://github.com/mm-asraf/jol-memory-analyser/issues) |
+| Discussions | [github.com/mm-asraf/jol-memory-analyser/discussions](https://github.com/mm-asraf/jol-memory-analyser/discussions) |
+| Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Code of Conduct | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
+| Security | [SECURITY.md](SECURITY.md) |
 
 ## License
 
