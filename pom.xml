@@ -6,7 +6,7 @@
 
   <groupId>io.github.mm-asraf</groupId>
   <artifactId>jol-memory-analyser</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <name>JOL Memory Analyser</name>

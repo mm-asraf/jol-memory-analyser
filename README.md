@@ -4,7 +4,7 @@ A practical exploration of JVM object memory layout using [Java Object Layout (J
 
 Built and tested on Java 17+.
 
-**Published on Maven Central** — [`io.github.mm-asraf:jol-memory-analyser:1.0.0`](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar) · [search.maven.org](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar)
+**Published on Maven Central** — [`io.github.mm-asraf:jol-memory-analyser:1.0.1`](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar) · [search.maven.org](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar)
 
 ## What it covers
 
@@ -45,7 +45,7 @@ src/test/java/com/asraf/jol/
 
 ## Use from Maven Central
 
-Add the dependency (replace **`1.0.0`** with the latest [Central listing](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser) if newer):
+Add the dependency (replace **`1.0.1`** with the latest [Central listing](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser) if newer):
 
 **Maven**
 
@@ -53,26 +53,26 @@ Add the dependency (replace **`1.0.0`** with the latest [Central listing](https:
 <dependency>
   <groupId>io.github.mm-asraf</groupId>
   <artifactId>jol-memory-analyser</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 
 **Gradle (Kotlin DSL)**
 
 ```kotlin
-implementation("io.github.mm-asraf:jol-memory-analyser:1.0.0")
+implementation("io.github.mm-asraf:jol-memory-analyser:1.0.1")
 ```
 
 The scanner entry point is **`com.asraf.jol.ProjectScanner`**. It analyses **compiled** classes (`target/classes` or another output directory). Run **`mvn compile`** (or your build) on the host project before scanning.
 
 ### Runnable standalone JAR
 
-`mvn package` produces an uber-JAR with classifier **`standalone`** and `Main-Class` set to `ProjectScanner`. The same artifact is published to Maven Central (resolve under `~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/1.0.0/` after you depend on it, or build locally):
+`mvn package` produces an uber-JAR with classifier **`standalone`** and `Main-Class` set to `ProjectScanner`. The same artifact is published to Maven Central (resolve under `~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/1.0.1/` after you depend on it, or build locally):
 
 ```bash
-java -jar target/jol-memory-analyser-1.0.0-standalone.jar
-java -jar target/jol-memory-analyser-1.0.0-standalone.jar --dir /path/to/other/target/classes
-java -jar target/jol-memory-analyser-1.0.0-standalone.jar --file src/main/java/com/example/MyClass.java
+java -jar target/jol-memory-analyser-1.0.1-standalone.jar
+java -jar target/jol-memory-analyser-1.0.1-standalone.jar --dir /path/to/other/target/classes
+java -jar target/jol-memory-analyser-1.0.1-standalone.jar --file src/main/java/com/example/MyClass.java
 ```
 
 Use this JAR from any directory; pass **`--dir`**, **`--file`**, **`--class`**, **`--output`**, and **`--output-dev`** as documented below.
@@ -96,7 +96,7 @@ The **`intellij-plugin/`** module is a small IntelliJ Platform plugin that adds:
 - **Tools → Scan project with JOL Memory Analyser…**
 - **Settings → Tools → JOL Memory Analyser** to set an explicit path to `jol-memory-analyser-*-standalone.jar`
 
-The plugin runs `java -jar …/jol-memory-analyser-*-standalone.jar` in your project root. It finds the JAR by, in order: environment variable **`JOL_MEMORY_ANALYSER_JAR`**, the optional setting above, **`target/*-standalone.jar`** in the open project, then **`~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/`** (after Maven resolves the artifact from Central — e.g. **`mvn dependency:get -Dartifact=io.github.mm-asraf:jol-memory-analyser:1.0.0:jar:standalone`** for the uber-JAR — or run **`mvn package`** in this repo).
+The plugin runs `java -jar …/jol-memory-analyser-*-standalone.jar` in your project root. It finds the JAR by, in order: environment variable **`JOL_MEMORY_ANALYSER_JAR`**, the optional setting above, **`target/*-standalone.jar`** in the open project, then **`~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/`** (after Maven resolves the artifact from Central — e.g. **`mvn dependency:get -Dartifact=io.github.mm-asraf:jol-memory-analyser:1.0.1:jar:standalone`** for the uber-JAR — or run **`mvn package`** in this repo).
 
 See **`intellij-plugin/README.md`** for how to run **`runIde`** and package the plugin ZIP.
 
@@ -242,7 +242,7 @@ Structure              Category    Shallow   Retained    Bytes/elem  Overhead
 
 ## Publishing to Maven Central (maintainers)
 
-Release **`1.0.0`** is [on Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar). To publish a **new version** (coordinates are immutable — bump `<version>` in `pom.xml`):
+Artifact **`1.0.0`** is [on Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar); **`1.0.1`** is the next release line in this repo. To publish a **new version** (coordinates are immutable — bump `<version>` in `pom.xml`):
 
 1. Namespace **`io.github.mm-asraf`** must remain verified on [Maven Central](https://central.sonatype.com/) (matches your GitHub handle).
 2. Keep **`groupId`**, **`<scm>`**, and **`<url>`** aligned with this repository.
