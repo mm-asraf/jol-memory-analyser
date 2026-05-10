@@ -4,7 +4,7 @@ A practical exploration of JVM object memory layout using [Java Object Layout (J
 
 Built and tested on Java 17+.
 
-**Published on Maven Central** — [`io.github.mm-asraf:jol-memory-analyser:1.0.1`](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar) · [search.maven.org](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar)
+**Published on Maven Central** — [`1.0.1` overview](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/overview) · [artifact files](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar) · [search.maven.org](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/jar)
 
 ## What it covers
 
@@ -227,37 +227,25 @@ Structure              Category    Shallow   Retained    Bytes/elem  Overhead
 - Retained size can be orders of magnitude larger than shallow size once references are involved.
 - Empty collections still allocate internal arrays or sentinel nodes — overhead exists at N=0.
 
-## Publishing to Maven Central (maintainers)
+## Using the library (after you add the dependency)
 
-Artifact **`1.0.0`** is [on Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar); **`1.0.1`** is the next release line in this repo. To publish a **new version** (coordinates are immutable — bump `<version>` in `pom.xml`):
+You resolved **`io.github.mm-asraf:jol-memory-analyser`** from [Maven Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.1/overview) (see **Use from Maven Central** above for the XML / Gradle coordinates). Then:
 
-1. Namespace **`io.github.mm-asraf`** must remain verified on [Maven Central](https://central.sonatype.com/) (matches your GitHub handle).
-2. Keep **`groupId`**, **`<scm>`**, and **`<url>`** aligned with this repository.
-3. Use a GPG signing key (`gpg --full-gen-key`) and publish the public key to a keyserver (e.g. `gpg --keyserver keyserver.ubuntu.com --send-keys KEY_ID`).
-4. Add your [Central user token](https://central.sonatype.com/usertoken) to `~/.m2/settings.xml` with server **`id`** **`central`** (must match `<publishingServerId>` in `pom.xml`):
+1. **Compile the project you want to analyse** so bytecode exists under **`target/classes`** (or another output directory you pass with **`--dir`**).
 
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>central</id>
-      <username>YOUR_TOKEN_USERNAME</username>
-      <password>YOUR_TOKEN_PASSWORD</password>
-    </server>
-  </servers>
-</settings>
-```
+2. **Run the scanner** from that project’s root. The entry point is **`com.asraf.jol.ProjectScanner`**. Typical invocation so Maven puts **your compile dependencies** on the classpath (important for Spring Boot and similar):
 
-5. Dry run, then deploy:
+   ```bash
+   mvn -q compile exec:java -Dexec.mainClass=com.asraf.jol.ProjectScanner
+   ```
 
-```bash
-mvn clean verify -Prelease
-mvn clean deploy -Prelease
-```
+   If your POM does not yet define **`exec-maven-plugin`**, add a minimal `exec-maven-plugin` execution, or run the **standalone** uber-JAR instead (**Runnable standalone JAR** and **Spring Boot** note above).
 
-6. In [Deployments](https://central.sonatype.com/publishing/deployments), validate and **Publish** if automatic publishing is off.
+3. **Outputs** — by default the scanner writes **`memory-report.xlsx`** (technical) and **`memory-report-developer.xlsx`** (developer guide) in the **working directory**. Override with **`--output`** / **`--output-dev`**. Column meanings, colours, and CLI flags are in **Project scanner — Excel reports** and **Scan commands** above.
 
-On macOS, if GPG reports **“Inappropriate ioctl for device”**, set `export GPG_TTY=$(tty)` before Maven and ensure `gpg-agent` / pinentry can prompt for your key passphrase.
+4. **Optional CLI flags** — scan one class (`--class`, `--file`), another tree (`--dir`), custom report paths. See the **`ProjectScanner`** comment block in source or the bash examples under **Scan commands**.
+
+5. **Embedding in code** — you can call **`LayoutAnalyser`**, **`ClassScanner`**, and the reporters from your own tools/tests on the same classpath as your application classes.
 
 ## License
 
