@@ -41,8 +41,9 @@ public class ClassScanner {
                                 && !clazz.isEnum() && !clazz.isRecord()) {
                             classes.add(clazz);
                         }
-                    } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                        log.warn("Skipping {} — {}", name, e.getMessage());
+                    } catch (Throwable e) {
+                        // LinkageError (e.g. NoClassDefFoundError) if a class references missing deps
+                        log.warn("Skipping {} — {}", name, e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
                     }
                 });
         }

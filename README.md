@@ -4,6 +4,8 @@ A practical exploration of JVM object memory layout using [Java Object Layout (J
 
 Built and tested on Java 17+.
 
+**Published on Maven Central** — [`io.github.mm-asraf:jol-memory-analyser:1.0.0`](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar) · [search.maven.org](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar)
+
 ## What it covers
 
 - **ClassLayout** — object header, field offsets, and alignment gaps for any class
@@ -41,9 +43,11 @@ src/test/java/com/asraf/jol/
 - Java 17+
 - Maven 3.6+
 
-## Use as a Maven dependency
+## Use from Maven Central
 
-After the artifact is published to Maven Central, add:
+Add the dependency (replace **`1.0.0`** with the latest [Central listing](https://search.maven.org/artifact/io.github.mm-asraf/jol-memory-analyser) if newer):
+
+**Maven**
 
 ```xml
 <dependency>
@@ -53,11 +57,17 @@ After the artifact is published to Maven Central, add:
 </dependency>
 ```
 
+**Gradle (Kotlin DSL)**
+
+```kotlin
+implementation("io.github.mm-asraf:jol-memory-analyser:1.0.0")
+```
+
 The scanner entry point is **`com.asraf.jol.ProjectScanner`**. It analyses **compiled** classes (`target/classes` or another output directory). Run **`mvn compile`** (or your build) on the host project before scanning.
 
 ### Runnable standalone JAR
 
-`mvn package` also builds an uber-JAR with classifier **`standalone`** and `Main-Class` set to `ProjectScanner`:
+`mvn package` produces an uber-JAR with classifier **`standalone`** and `Main-Class` set to `ProjectScanner`. The same artifact is published to Maven Central (resolve under `~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/1.0.0/` after you depend on it, or build locally):
 
 ```bash
 java -jar target/jol-memory-analyser-1.0.0-standalone.jar
@@ -66,6 +76,14 @@ java -jar target/jol-memory-analyser-1.0.0-standalone.jar --file src/main/java/c
 ```
 
 Use this JAR from any directory; pass **`--dir`**, **`--file`**, **`--class`**, **`--output`**, and **`--output-dev`** as documented below.
+
+**Spring Boot and other framework apps:** The uber-JAR run alone only loads **`target/classes`**, not your compile dependencies. If JOL needs types from **`spring-web`** (e.g. `HttpStatusCode`) or other libraries, those classes are **skipped** with a log warning, and the Excel reports still list everything that was analysed. For full coverage, run the scanner **via Maven** so the full classpath is available:
+
+```bash
+mvn -q compile exec:java -Dexec.mainClass=com.asraf.jol.ProjectScanner
+```
+
+(or build an extended **`java -cp`** that includes `target/classes`, all dependency JARs, and the standalone JAR — see [ProjectScanner](src/main/java/com/asraf/jol/ProjectScanner.java) docs.)
 
 ### IDE integration
 
@@ -78,7 +96,7 @@ The **`intellij-plugin/`** module is a small IntelliJ Platform plugin that adds:
 - **Tools → Scan project with JOL Memory Analyser…**
 - **Settings → Tools → JOL Memory Analyser** to set an explicit path to `jol-memory-analyser-*-standalone.jar`
 
-The plugin runs `java -jar …/jol-memory-analyser-*-standalone.jar` in your project root. It finds the JAR by, in order: environment variable **`JOL_MEMORY_ANALYSER_JAR`**, the optional setting above, **`target/*-standalone.jar`** in the open project, then **`~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/`**. Build **`mvn package`** in this repo first, or install the standalone artifact from Maven Central before scanning other projects.
+The plugin runs `java -jar …/jol-memory-analyser-*-standalone.jar` in your project root. It finds the JAR by, in order: environment variable **`JOL_MEMORY_ANALYSER_JAR`**, the optional setting above, **`target/*-standalone.jar`** in the open project, then **`~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/`** (after Maven resolves the artifact from Central — e.g. **`mvn dependency:get -Dartifact=io.github.mm-asraf:jol-memory-analyser:1.0.0:jar:standalone`** for the uber-JAR — or run **`mvn package`** in this repo).
 
 See **`intellij-plugin/README.md`** for how to run **`runIde`** and package the plugin ZIP.
 
@@ -222,15 +240,14 @@ Structure              Category    Shallow   Retained    Bytes/elem  Overhead
 - Retained size can be orders of magnitude larger than shallow size once references are involved.
 - Empty collections still allocate internal arrays or sentinel nodes — overhead exists at N=0.
 
-## Publishing to Maven Central
+## Publishing to Maven Central (maintainers)
 
-To publish a signed release:
+Release **`1.0.0`** is [on Central](https://central.sonatype.com/artifact/io.github.mm-asraf/jol-memory-analyser/1.0.0/jar). To publish a **new version** (coordinates are immutable — bump `<version>` in `pom.xml`):
 
-1. Register on [Maven Central](https://central.sonatype.com/) and claim the namespace `io.github.mm-asraf` (must match your verified GitHub handle).
-2. Update `groupId` in `pom.xml` to your verified namespace.
-3. Update the `<scm>` and `<url>` sections to point at your repository.
-4. Generate a GPG key (`gpg --gen-key`) and upload the public key to a keyserver.
-5. Add your Central portal token to `~/.m2/settings.xml`:
+1. Namespace **`io.github.mm-asraf`** must remain verified on [Maven Central](https://central.sonatype.com/) (matches your GitHub handle).
+2. Keep **`groupId`**, **`<scm>`**, and **`<url>`** aligned with this repository.
+3. Use a GPG signing key (`gpg --full-gen-key`) and publish the public key to a keyserver (e.g. `gpg --keyserver keyserver.ubuntu.com --send-keys KEY_ID`).
+4. Add your [Central user token](https://central.sonatype.com/usertoken) to `~/.m2/settings.xml` with server **`id`** **`central`** (must match `<publishingServerId>` in `pom.xml`):
 
 ```xml
 <settings>
@@ -244,11 +261,16 @@ To publish a signed release:
 </settings>
 ```
 
-6. Run the release:
+5. Dry run, then deploy:
 
 ```bash
-mvn deploy -Prelease
+mvn clean verify -Prelease
+mvn clean deploy -Prelease
 ```
+
+6. In [Deployments](https://central.sonatype.com/publishing/deployments), validate and **Publish** if automatic publishing is off.
+
+On macOS, if GPG reports **“Inappropriate ioctl for device”**, set `export GPG_TTY=$(tty)` before Maven and ensure `gpg-agent` / pinentry can prompt for your key passphrase.
 
 ## License
 

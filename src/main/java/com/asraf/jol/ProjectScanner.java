@@ -52,12 +52,17 @@ public class ProjectScanner {
         log.info("Analysing {} class(es)...", classes.size());
 
         List<LayoutAnalysis> results = new ArrayList<>();
+        int skipped = 0;
         for (Class<?> clazz : classes) {
             try {
                 results.add(analyser.analyse(clazz));
-            } catch (Exception e) {
-                log.warn("Skipping {} — {}", clazz.getName(), e.getMessage());
+            } catch (Throwable e) {
+                skipped++;
+                log.warn("Skipping {} — {}{}", clazz.getName(), deepestMessage(e), classpathHint(e));
             }
+        }
+        if (skipped > 0) {
+            log.warn("{} class(es) skipped (see warnings above). For Spring / multi-module apps run from project root: mvn -q compile exec:java -Dexec.mainClass=com.asraf.jol.ProjectScanner", skipped);
         }
 
         printConsoleTable(results);
@@ -107,6 +112,34 @@ public class ProjectScanner {
 
     private static String truncate(String s, int max) {
         return s.length() <= max ? s : s.substring(0, max - 1) + "…";
+    }
+
+    private static String deepestMessage(Throwable e) {
+        Throwable t = e;
+        String last = t.getClass().getSimpleName();
+        while (t != null) {
+            if (t.getMessage() != null && !t.getMessage().isBlank()) {
+                last = t.getMessage();
+            }
+            if (t.getCause() == t) {
+                break;
+            }
+            t = t.getCause();
+        }
+        return last;
+    }
+
+    /**
+     * Standalone JAR only has {@code target/classes} on the URLClassLoader; types from
+     * {@code spring-web} and other dependencies are missing → {@link LinkageError}.
+     */
+    private static String classpathHint(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause()) {
+            if (t instanceof LinkageError) {
+                return " — add compile dependencies to the JVM classpath (e.g. mvn compile exec:java -Dexec.mainClass=com.asraf.jol.ProjectScanner from the host project).";
+            }
+        }
+        return "";
     }
 
     private static Config parseArgs(String[] args) {
