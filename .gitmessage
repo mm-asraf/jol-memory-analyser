@@ -2,12 +2,11 @@
 #
 # Scopes for jol-memory-analyser:
 #   core     — Maven library (src/main/java, reports, scanner)
-#   plugin   — IntelliJ plugin (intellij-plugin/)
-#   build    — pom.xml, Gradle, CI
+#   build    — pom.xml, CI
 #   docs     — README and user-facing text
 #
 # Examples:
 #   core: align Excel columns for nested field paths
-#   plugin: stream scanner stderr to JOL tool window
-#   build: bump IntelliJ plugin to 1.0.3
+#   core: skip analysis when LinkageError (missing framework deps)
+#   docs: document Maven Central coordinates
 #

@@ -87,22 +87,9 @@ mvn -q compile exec:java -Dexec.mainClass=com.asraf.jol.ProjectScanner
 
 ### IDE integration
 
-#### IntelliJ IDEA plugin (editor context menu)
+#### IntelliJ IDEA (External Tools)
 
-The **`intellij-plugin/`** module is a small IntelliJ Platform plugin that adds:
-
-- **Editor → right-click → JOL Memory Analyser → Scan with JOL Memory Analyser** (current `.java` file)
-- The same submenu: **Scan whole project with JOL Memory Analyser**
-- **Tools → Scan project with JOL Memory Analyser…**
-- **Settings → Tools → JOL Memory Analyser** to set an explicit path to `jol-memory-analyser-*-standalone.jar`
-
-The plugin runs `java -jar …/jol-memory-analyser-*-standalone.jar` in your project root. It finds the JAR by, in order: environment variable **`JOL_MEMORY_ANALYSER_JAR`**, the optional setting above, **`target/*-standalone.jar`** in the open project, then **`~/.m2/repository/io/github/mm-asraf/jol-memory-analyser/`** (after Maven resolves the artifact from Central — e.g. **`mvn dependency:get -Dartifact=io.github.mm-asraf:jol-memory-analyser:1.0.1:jar:standalone`** for the uber-JAR — or run **`mvn package`** in this repo).
-
-See **`intellij-plugin/README.md`** for how to run **`runIde`** and package the plugin ZIP.
-
-#### IntelliJ without the plugin (External Tools)
-
-If you prefer not to install the plugin, use **External Tools**:
+Use **External Tools** to run the scanner from the IDE:
 
 1. **Settings → Tools → External Tools → +**
 2. **Name:** `JOL Memory Analyser — scan project`
